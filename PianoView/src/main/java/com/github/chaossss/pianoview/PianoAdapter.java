@@ -5,72 +5,75 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by chaos on 2016/1/19.
  */
 public class PianoAdapter extends BaseAdapter {
-    /**
-     * item的宽度
-     */
-    private float itemWidth;
-    /**
-     * 数据源
-     */
-    private List<Card> mCardList;
-
+    private float itemSize;
     private PianoView mRhythmLayout;
+    private List<String> iconUrlList;
 
-    public PianoAdapter(PianoView rhythmLayout, List<Card> cardList) {
+    public PianoAdapter(PianoView rhythmLayout) {
         this.mRhythmLayout = rhythmLayout;
-        this.mCardList = new ArrayList();
-        this.mCardList.addAll(cardList);
+        this.iconUrlList = new ArrayList<>();
     }
 
-    public List<Card> getCardList() {
-        return this.mCardList;
+    @Override
+    public Object getItem(int position) {
+        return iconUrlList.get(position);
     }
 
-    public void addCardList(List<Card> cardList) {
-        mCardList.addAll(cardList);
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    public List<String> getIconUrlList() {
+        return iconUrlList;
+    }
+
+    public void addIconUrlList(List<String> iconUrlList) {
+        this.iconUrlList.addAll(iconUrlList);
+    }
+
+    public void resetIconUrlList(List<String> iconUrlList){
+        this.iconUrlList = iconUrlList;
     }
 
     public int getCount() {
-        return this.mCardList.size();
+        return iconUrlList == null ? 0 : iconUrlList.size();
     }
-
-    public Object getItem(int position) {
-        return this.mCardList.get(position);
-    }
-
-    public long getItemId(int paramInt) {
-        return (this.mCardList.get(paramInt)).getUid();
-    }
-
-
+    
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
         Context context = parent.getContext();
 
-        //设置item布局的大小以及Y轴的位置
-        RelativeLayout root = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.layout_piano_holder, parent, false);
-        root.setLayoutParams(new RelativeLayout.LayoutParams((int) itemWidth, context.getResources().getDimensionPixelSize(R.dimen.rhythm_item_height)));
-        root.setTranslationY(itemWidth);
+        if(convertView == null){
+            convertView = LayoutInflater.from(context).inflate(R.layout.layout_piano_holder, parent, false);
+            convertView.setLayoutParams(new RelativeLayout.LayoutParams((int) itemSize, context.getResources().getDimensionPixelSize(R.dimen.rhythm_item_height)));
+            convertView.setTranslationY(itemSize);
+            holder = new ViewHolder(convertView);
 
-        int iconSize = (int) itemWidth - 2 * context.getResources().getDimensionPixelSize(R.dimen.rhythm_icon_margin);
-        ImageView imageIcon = (ImageView) root.findViewById(R.id.image_icon);
-        ViewGroup.LayoutParams iconParams = imageIcon.getLayoutParams();
-        iconParams.width = iconSize;
-        iconParams.height = iconSize;
-        imageIcon.setLayoutParams(iconParams);
-        //设置背景图片
-        imageIcon.setBackgroundResource(AppUtils.getDrawableIdByName(context, mCardList.get(position).getIconUrl()));
+            int iconSize = (int) itemSize - 2 * context.getResources().getDimensionPixelSize(R.dimen.rhythm_icon_margin);
+            ViewGroup.LayoutParams iconParams = holder.icon.getLayoutParams();
+            iconParams.width = iconSize;
+            iconParams.height = iconSize;
+            holder.icon.setLayoutParams(iconParams);
+        } else {
+            holder = (ViewHolder)convertView.getTag();
+        }
 
-        return root;
+        Glide.with(parent.getContext()).load(iconUrlList.get(position)).centerCrop().into(holder.icon);
+
+        return convertView;
     }
 
     public void notifyDataSetChanged() {
@@ -78,14 +81,18 @@ public class PianoAdapter extends BaseAdapter {
         this.mRhythmLayout.invalidateData();
     }
 
-    public void setCardList(List<Card> paramList) {
-        this.mCardList = paramList;
-    }
-
     /**
      * 设置每个item的宽度
      */
-    public void setItemWidth(float width) {
-        this.itemWidth = width;
+    public void setItemSize(float itemSize) {
+        this.itemSize = itemSize;
+    }
+
+    private class ViewHolder{
+        RoundedImageView icon;
+
+        public ViewHolder(View root) {
+            icon = (RoundedImageView) root.findViewById(R.id.image_icon);
+        }
     }
 }
