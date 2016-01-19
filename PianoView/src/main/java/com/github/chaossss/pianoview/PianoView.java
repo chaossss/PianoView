@@ -44,7 +44,7 @@ public class PianoView extends HorizontalScrollView {
     /**
      * item的宽度，为屏幕的1/7
      */
-    private float mItemWidth;
+    private float mItemSize;
     /**
      * item位移最大的高度
      */
@@ -92,9 +92,9 @@ public class PianoView extends HorizontalScrollView {
         //获得屏幕宽度
         mScreenWidth = AppUtils.getScreenDisplayMetrics(mContext).widthPixels;
         //获取Item的宽度，为屏幕的七分之一
-        mItemWidth = mScreenWidth / 7;
+        mItemSize = mScreenWidth / 7;
         //钢琴按钮的最大高度
-        mMaxTranslationHeight = (int) mItemWidth;
+        mMaxTranslationHeight = (int) mItemSize;
         mIntervalHeight = (mMaxTranslationHeight / 6);
         //初始化
         mEdgeSizeForShiftRhythm = getResources().getDimensionPixelSize(R.dimen.rhythm_edge_size_for_shift);
@@ -114,7 +114,7 @@ public class PianoView extends HorizontalScrollView {
             mLinearLayout = (LinearLayout) getChildAt(0);
         }
         //循环获取adapter中的View，设置item的宽度并且add到mLinearLayout中
-        mAdapter.setItemWidth(mItemWidth);
+        mAdapter.setItemSize(mItemSize);
         for (int i = 0; i < this.mAdapter.getCount(); i++) {
             mLinearLayout.addView(mAdapter.getView(i, null, null));
         }
@@ -202,7 +202,7 @@ public class PianoView extends HorizontalScrollView {
         //得到屏幕上可见的7个小图标的视图
         List viewList = getVisibleViews();
         //当前手指所在的item
-        int position = (int) (scrollX / mItemWidth);
+        int position = (int) (scrollX / mItemSize);
         //如果手指位置没有发生变化或者大于childCount的则跳出方法不再继续执行
         if (position == mCurrentItemPosition || position >= mLinearLayout.getChildCount())
             return;
@@ -287,7 +287,7 @@ public class PianoView extends HorizontalScrollView {
         for (int i = 0; i < size; i++) {
             View view = mLinearLayout.getChildAt(i);
             //当出现小图标的x轴比当前ScrollView的x轴大时，这个小图标就是当前可见的第一个
-            if (getScrollX() < view.getX() + mItemWidth / 2.0F)
+            if (getScrollX() < view.getX() + mItemSize / 2.0F)
                 return i;
         }
         return 0;
@@ -482,8 +482,8 @@ public class PianoView extends HorizontalScrollView {
     /*
      * 得到每个钢琴按钮的宽度
      */
-    public float getRhythmItemWidth() {
-        return mItemWidth;
+    public float getRhythmItemSize() {
+        return mItemSize;
     }
 
 
