@@ -140,7 +140,7 @@ public class RoundedImageView extends ImageView {
      * Return the current scale type in use by this ImageView.
      *
      * @attr ref android.R.styleable#ImageView_scaleType
-     * @see android.widget.ImageView.ScaleType
+     * @see ScaleType
      */
     @Override
     public ScaleType getScaleType() {

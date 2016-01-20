@@ -20,7 +20,6 @@ import java.util.TimerTask;
  * Created by chaos on 2016/1/19.
  */
 public class PianoView extends HorizontalScrollView {
-
     private Context mContext;
 
     /**
@@ -28,23 +27,23 @@ public class PianoView extends HorizontalScrollView {
      */
     private PianoAdapter mAdapter;
 
-    private Handler mHandler;
+    private Handler handler;
 
     private ShiftMonitorTimer mTimer;
 
     /**
      * 监听器，监听手指离开屏幕时的位置
      */
-    private PianoItemListener mListener;
+    private PianoItemListener pianoItemListener;
 
     /**
      * ScrollView的子控件
      */
-    private LinearLayout mLinearLayout;
+    private LinearLayout itemWrapper;
     /**
      * item的宽度，为屏幕的1/7
      */
-    private float mItemSize;
+    private float mItemWidth;
     /**
      * item位移最大的高度
      */
@@ -60,7 +59,7 @@ public class PianoView extends HorizontalScrollView {
     /**
      * 左右两边的尺寸
      */
-    private int mEdgeSizeForShiftRhythm;
+    private int mEdgeSizeForShiftPiano;
     /**
      * 屏幕宽度
      */
@@ -92,17 +91,17 @@ public class PianoView extends HorizontalScrollView {
         //获得屏幕宽度
         mScreenWidth = AppUtils.getScreenDisplayMetrics(mContext).widthPixels;
         //获取Item的宽度，为屏幕的七分之一
-        mItemSize = mScreenWidth / 7;
+        mItemWidth = mScreenWidth / 7;
         //钢琴按钮的最大高度
-        mMaxTranslationHeight = (int) mItemSize;
+        mMaxTranslationHeight = (int) mItemWidth;
         mIntervalHeight = (mMaxTranslationHeight / 6);
         //初始化
-        mEdgeSizeForShiftRhythm = getResources().getDimensionPixelSize(R.dimen.rhythm_edge_size_for_shift);
+        mEdgeSizeForShiftPiano = getResources().getDimensionPixelSize(R.dimen.rhythm_edge_size_for_shift);
         mCurrentItemPosition = -1;
         mLastDisplayItemPosition = -1;
         mScrollStartDelayTime = 0;
         mFingerDownTime = 0;
-        mHandler = new Handler();
+        handler = new Handler();
         mTimer = new ShiftMonitorTimer();
         mTimer.startMonitor();
     }
@@ -110,51 +109,44 @@ public class PianoView extends HorizontalScrollView {
     public void setAdapter(PianoAdapter adapter) {
         this.mAdapter = adapter;
         //获取HorizontalScrollView下的LinearLayout控件
-        if (mLinearLayout == null) {
-            mLinearLayout = (LinearLayout) getChildAt(0);
+        if (itemWrapper == null) {
+            itemWrapper = (LinearLayout) getChildAt(0);
         }
-        //循环获取adapter中的View，设置item的宽度并且add到mLinearLayout中
-        mAdapter.setItemSize(mItemSize);
+        //循环获取adapter中的View，设置item的宽度并且add到itemWrapper中
+        mAdapter.setItemWidth(mItemWidth);
         for (int i = 0; i < this.mAdapter.getCount(); i++) {
-            mLinearLayout.addView(mAdapter.getView(i, null, null));
+            itemWrapper.addView(mAdapter.getView(i, null, null));
         }
     }
 
 
     public void invalidateData() {
-        int childCount = this.mLinearLayout.getChildCount();
+        int childCount = this.itemWrapper.getChildCount();
         if (childCount < this.mAdapter.getCount())
             for (int i = childCount; i < this.mAdapter.getCount(); i++)
-                this.mLinearLayout.addView(this.mAdapter.getView(i, null, null));
+                this.itemWrapper.addView(this.mAdapter.getView(i, null, null));
     }
 
-    /**
-     * 触摸监听
-     *
-     * @param ev
-     * @return
-     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {
-            case MotionEvent.ACTION_MOVE://移动
+            case MotionEvent.ACTION_MOVE:
                 mTimer.monitorTouchPosition(ev.getX(), ev.getY());
                 updateItemHeight(ev.getX());
                 break;
-            case MotionEvent.ACTION_DOWN://按下
+            case MotionEvent.ACTION_DOWN:
                 mTimer.monitorTouchPosition(ev.getX(), ev.getY());
                 //得到按下时的时间戳
                 mFingerDownTime = System.currentTimeMillis();
                 //更新钢琴按钮的高度
                 updateItemHeight(ev.getX());
-                if (mListener != null)
-                    mListener.onStartSwipe();
+                if (pianoItemListener != null)
+                    pianoItemListener.onStartSwipe();
                 break;
             case MotionEvent.ACTION_UP://抬起
                 actionUp();
                 break;
         }
-
         return true;
     }
 
@@ -168,43 +160,39 @@ public class PianoView extends HorizontalScrollView {
         }
         int firstPosition = getFirstVisibleItemPosition();
         int lastPosition = firstPosition + mCurrentItemPosition;
-        final List viewList = getVisibleViews();
+        final List<View> viewList = getVisibleViews();
         int size = viewList.size();
         //将当前小图标从要落下的ViewList中删除
         if (size > mCurrentItemPosition) {
             viewList.remove(mCurrentItemPosition);
         }
         if (firstPosition - 1 >= 0) {
-            viewList.add(mLinearLayout.getChildAt(firstPosition - 1));
+            viewList.add(itemWrapper.getChildAt(firstPosition - 1));
         }
-        if (lastPosition + 1 <= mLinearLayout.getChildCount()) {
-            viewList.add(mLinearLayout.getChildAt(lastPosition + 1));
+        if (lastPosition + 1 <= itemWrapper.getChildCount()) {
+            viewList.add(itemWrapper.getChildAt(lastPosition + 1));
         }
         //200毫秒后执行动画
-        this.mHandler.postDelayed(new Runnable() {
+        handler.postDelayed(new Runnable() {
             public void run() {
                 for (int i = 0; i < viewList.size(); i++) {
-                    View downView = (View) viewList.get(i);
+                    View downView = viewList.get(i);
                     shootDownItem(downView, true);
                 }
             }
         }, 200L);
         //触发监听
-        if (mListener != null)
-            mListener.onSelected(lastPosition);
+        if (pianoItemListener != null)
+            pianoItemListener.onPianoItemSelected(lastPosition);
         mCurrentItemPosition = -1;
         //使设备震动
         vibrate(20L);
     }
 
-    //更新小图标的高度
     private void updateItemHeight(float scrollX) {
-        //得到屏幕上可见的7个小图标的视图
-        List viewList = getVisibleViews();
-        //当前手指所在的item
-        int position = (int) (scrollX / mItemSize);
-        //如果手指位置没有发生变化或者大于childCount的则跳出方法不再继续执行
-        if (position == mCurrentItemPosition || position >= mLinearLayout.getChildCount())
+        List<View> viewList = getVisibleViews();
+        int position = (int) (scrollX / mItemWidth);
+        if (position == mCurrentItemPosition || position >= itemWrapper.getChildCount())
             return;
         mCurrentItemPosition = position;
         makeItems(position, viewList);
@@ -217,36 +205,15 @@ public class PianoView extends HorizontalScrollView {
         if (fingerPosition >= viewList.size()) {
             return;
         }
-        int size = viewList.size();
-        for (int i = 0; i < size; i++) {
-            //根据小图标的位置计算出在Y轴需要位移的大小
 
+        for (int i = 0; i < viewList.size(); i++) {
             int translationY = Math.min(Math.max(Math.abs(fingerPosition - i) * mIntervalHeight, 10), mMaxTranslationHeight);
-            //位移动画
             updateItemHeightAnimator(viewList.get(i), translationY);
         }
-
     }
 
-
-    /**
-     * 得到当前可见的7个小图标
-     */
     private List<View> getVisibleViews() {
-        ArrayList arrayList = new ArrayList();
-        if (mLinearLayout == null)
-            return arrayList;
-        //当前可见的第一个小图标的位置
-        int firstPosition = getFirstVisibleItemPosition();
-        //当前可见的最后一个小图标的位置
-        int lastPosition = firstPosition + 7;
-        if (mLinearLayout.getChildCount() < 7) {
-            lastPosition = mLinearLayout.getChildCount();
-        }
-        //取出当前可见的7个小图标
-        for (int i = firstPosition; i < lastPosition; i++)
-            arrayList.add(mLinearLayout.getChildAt(i));
-        return arrayList;
+        return getVisibleViews(false, false);
     }
 
     /**
@@ -257,39 +224,45 @@ public class PianoView extends HorizontalScrollView {
      * @return
      */
     private List<View> getVisibleViews(boolean isForward, boolean isBackward) {
-        ArrayList viewList = new ArrayList();
-        if (this.mLinearLayout == null)
-            return viewList;
+        List<View> visibleViews = new ArrayList<>();
+
+        if (this.itemWrapper == null)
+            return visibleViews;
+
         int firstPosition = getFirstVisibleItemPosition();
         int lastPosition = firstPosition + 7;
-        if (mLinearLayout.getChildCount() < 7) {
-            lastPosition = mLinearLayout.getChildCount();
+
+        if (itemWrapper.getChildCount() < 7) {
+            lastPosition = itemWrapper.getChildCount();
         }
+
         if ((isForward) && (firstPosition > 0))
             firstPosition--;
-        if ((isBackward) && (lastPosition < mLinearLayout.getChildCount()))
-            lastPosition++;
-        for (int i = firstPosition; i < lastPosition; i++)
-            viewList.add(mLinearLayout.getChildAt(i));
 
-        return viewList;
+        if ((isBackward) && (lastPosition < itemWrapper.getChildCount()))
+            lastPosition++;
+
+        for (int i = firstPosition; i < lastPosition; i++)
+            visibleViews.add(itemWrapper.getChildAt(i));
+
+        return visibleViews;
     }
 
     /**
      * 得到可见的第一个小图标的位置
      */
     public int getFirstVisibleItemPosition() {
-        if (mLinearLayout == null) {
+        if (itemWrapper == null) {
             return 0;
         }
-        //获取小图标的数量
-        int size = mLinearLayout.getChildCount();
-        for (int i = 0; i < size; i++) {
-            View view = mLinearLayout.getChildAt(i);
+
+        for (int i = 0; i < itemWrapper.getChildCount(); i++) {
+            View view = itemWrapper.getChildAt(i);
             //当出现小图标的x轴比当前ScrollView的x轴大时，这个小图标就是当前可见的第一个
-            if (getScrollX() < view.getX() + mItemSize / 2.0F)
+            if (getScrollX() < view.getX() + mItemWidth / 2.0F)
                 return i;
         }
+
         return 0;
     }
 
@@ -306,7 +279,7 @@ public class PianoView extends HorizontalScrollView {
             this.x = x;
             this.y = y;
             //当按下位置在第一个后最后一个，或x<0,y<0时，canShift为false，使计时器线程中的代码不能执行
-            if ((x < 0.0F) || ((x > mEdgeSizeForShiftRhythm) && (x < mScreenWidth - mEdgeSizeForShiftRhythm)) || (y < 0.0F)) {
+            if ((x < 0.0F) || ((x > mEdgeSizeForShiftPiano) && (x < mScreenWidth - mEdgeSizeForShiftPiano)) || (y < 0.0F)) {
                 mFingerDownTime = System.currentTimeMillis();
                 this.canShift = false;
             } else {
@@ -327,7 +300,7 @@ public class PianoView extends HorizontalScrollView {
                             boolean isForward = false; //是否获取第firstPosition-1个小图标
                             boolean isBackward = false;//是否获取第lastPosition+1个小图标
                             final List<View> localList;
-                            if (x <= mEdgeSizeForShiftRhythm && x >= 0.0F) {//第一个
+                            if (x <= mEdgeSizeForShiftPiano && x >= 0.0F) {//第一个
                                 if (firstPosition - 1 >= 0) {
                                     mCurrentItemPosition = 0;
                                     toPosition = firstPosition - 1;
@@ -335,7 +308,7 @@ public class PianoView extends HorizontalScrollView {
                                     isBackward = false;
 
                                 }
-                            } else if (x > mScreenWidth - mEdgeSizeForShiftRhythm) {//最后一个
+                            } else if (x > mScreenWidth - mEdgeSizeForShiftPiano) {//最后一个
                                 if (getSize() >= 1 + (firstPosition + 7)) {
                                     mCurrentItemPosition = 7;
                                     toPosition = firstPosition + 1;
@@ -347,7 +320,7 @@ public class PianoView extends HorizontalScrollView {
                             if (isForward || isBackward) {
                                 localList = getVisibleViews(isForward, isBackward);
                                 final int finalToPosition = toPosition;
-                                mHandler.post(new Runnable() {
+                                handler.post(new Runnable() {
                                     public void run() {
                                         makeItems(mCurrentItemPosition, localList);//设置每个Item的高度
                                         scrollToPosition(finalToPosition, 200, 0, true);//设置ScrollView在x轴的坐标
@@ -355,9 +328,7 @@ public class PianoView extends HorizontalScrollView {
                                     }
                                 });
                             }
-
                         }
-
                     }
                 };
             }
@@ -368,14 +339,14 @@ public class PianoView extends HorizontalScrollView {
     }
 
     public int getSize() {
-        if (mLinearLayout == null) {
+        if (itemWrapper == null) {
             return 0;
         }
-        return mLinearLayout.getChildCount();
+        return itemWrapper.getChildCount();
     }
 
     public View getItemView(int position) {
-        return mLinearLayout.getChildAt(position);
+        return itemWrapper.getChildAt(position);
     }
 
     /**
@@ -427,7 +398,7 @@ public class PianoView extends HorizontalScrollView {
      * @return
      */
     public Animator shootDownItem(int viewPosition, boolean isStart) {
-        if ((viewPosition >= 0) && (mLinearLayout != null) && (getSize() > viewPosition))
+        if ((viewPosition >= 0) && (itemWrapper != null) && (getSize() > viewPosition))
             return shootDownItem(getItemView(viewPosition), isStart);
         return null;
     }
@@ -467,23 +438,23 @@ public class PianoView extends HorizontalScrollView {
     }
 
 
-    public void setRhythmListener(PianoItemListener listener) {
-        this.mListener = listener;
+    public void setPianoItepianoItemListener(PianoItemListener pianoItepianoItemListener) {
+        this.pianoItemListener = pianoItepianoItemListener;
     }
     /**
      * 设置滚动动画延迟执行时间
      *
      * @param scrollStartDelayTime 延迟时间毫秒为单位
      */
-    public void setScrollRhythmStartDelayTime(int scrollStartDelayTime) {
+    public void setScrollPianoStartDelayTime(int scrollStartDelayTime) {
         this.mScrollStartDelayTime = scrollStartDelayTime;
     }
 
     /*
      * 得到每个钢琴按钮的宽度
      */
-    public float getRhythmItemSize() {
-        return mItemSize;
+    public float getPianoItemWidth() {
+        return mItemWidth;
     }
 
 
@@ -492,7 +463,7 @@ public class PianoView extends HorizontalScrollView {
      *
      * @param position 前往的item位置
      */
-    public void showRhythmAtPosition(int position) {
+    public void showPianoAtPosition(int position) {
         //如果所要移动的位置和上一次一样则退出方法
         if (this.mLastDisplayItemPosition == position)
             return;
@@ -527,7 +498,7 @@ public class PianoView extends HorizontalScrollView {
         }
         //3个动画的组合
         AnimatorSet animatorSet2 = new AnimatorSet();
-        animatorSet2.playSequentially(new Animator[]{scrollAnimator, animatorSet1});
+        animatorSet2.playSequentially(scrollAnimator, animatorSet1);
         animatorSet2.start();
         mLastDisplayItemPosition = position;
     }
