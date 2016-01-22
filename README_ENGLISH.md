@@ -2,9 +2,9 @@
 
 [English Version](README_ENGLISH.md)
 
-PianoView 能提供一个有趣的类似钢琴键盘的 ViewPager Indicator，即目前最美应用使用的控件。
+PianoView provides a ViewPager Indicator looks like piano's keyboard.It's what [ZuiMei App]() uses now.
 
-效果图：
+Preview：
 
 ![](http://img.my.csdn.net/uploads/201601/22/1453434722_3349.gif)
 
@@ -16,7 +16,7 @@ PianoView 能提供一个有趣的类似钢琴键盘的 ViewPager Indicator，�
 
 ###Add Dependency
 
-在项目的 build.gradle 里添加：
+add below code in your build.gradle:
 
 ```
 dependencies {
@@ -27,7 +27,7 @@ dependencies {
 
 ##Customize PianoView
 
-目前还没有提供自定义的特性
+PianoView can't customize now
 
 ##Activity
 
