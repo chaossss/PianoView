@@ -1,4 +1,4 @@
-# BadgedView
+# PianoView
 
 [English Version](README_ENGLISH.md)
 
