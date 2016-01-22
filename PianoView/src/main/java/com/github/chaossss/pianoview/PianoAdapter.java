@@ -9,9 +9,11 @@ import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class PianoAdapter extends BaseAdapter {
     private float itemWidth;
@@ -52,8 +54,8 @@ public class PianoAdapter extends BaseAdapter {
         ViewHolder holder;
         int layoutSize = (int)itemWidth;
         int itemHeight = (int) pianoView.getPianoItemWidth() + (int) TypedValue.applyDimension(1, 10.0F, context.getResources().getDisplayMetrics());
-        int margin = context.getResources().getDimensionPixelSize(R.dimen.rhythm_icon_margin);
-        int imgSize = layoutSize - 2 * context.getResources().getDimensionPixelSize(R.dimen.rhythm_icon_margin);
+        int margin = context.getResources().getDimensionPixelSize(R.dimen.piano_item_padding);
+        int imgSize = layoutSize - 2 * context.getResources().getDimensionPixelSize(R.dimen.piano_item_padding);
 
         if(convertView == null){
             convertView = LayoutInflater.from(context).inflate(R.layout.layout_piano_holder, parent, false);
@@ -68,9 +70,9 @@ public class PianoAdapter extends BaseAdapter {
         }
 
         Glide.with(context)
-                .load(iconUrlList.get(position))
-                .centerCrop()
-                .into(holder.img);
+            .load(iconUrlList.get(position))
+            .centerCrop()
+            .into(holder.img);
 
         return convertView;
     }

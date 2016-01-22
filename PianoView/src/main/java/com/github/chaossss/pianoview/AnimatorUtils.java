@@ -14,7 +14,7 @@ public class AnimatorUtils {
     }
 
     public static Animator animViewFadeIn(View paramView, long paramLong, Animator.AnimatorListener paramAnimatorListener) {
-        ObjectAnimator localObjectAnimator = ObjectAnimator.ofFloat(paramView, "alpha", new float[]{0.0F, 1.0F});
+        ObjectAnimator localObjectAnimator = ObjectAnimator.ofFloat(paramView, "alpha", 0.0F, 1.0F);
         localObjectAnimator.setDuration(paramLong);
         if (paramAnimatorListener != null)
             localObjectAnimator.addListener(paramAnimatorListener);
@@ -27,7 +27,7 @@ public class AnimatorUtils {
     }
 
     public static Animator animViewFadeOut(View paramView, long paramLong, Animator.AnimatorListener paramAnimatorListener) {
-        ObjectAnimator localObjectAnimator = ObjectAnimator.ofFloat(paramView, "alpha", new float[]{1.0F, 0.0F});
+        ObjectAnimator localObjectAnimator = ObjectAnimator.ofFloat(paramView, "alpha", 1.0F, 0.0F);
         localObjectAnimator.setDuration(paramLong);
         if (paramAnimatorListener != null)
             localObjectAnimator.addListener(paramAnimatorListener);
@@ -90,5 +90,4 @@ public class AnimatorUtils {
         }
         return objectAnimator;
     }
-
 }

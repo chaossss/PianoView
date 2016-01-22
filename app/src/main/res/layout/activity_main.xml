@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="#000000">
     <com.github.chaossss.pianoview.PianoView
-        android:id="@+id/box_rhythm"
+        android:id="@+id/piano_view"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/rhythm_layout_height"
-        android:layout_alignParentBottom="true"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:orientation="horizontal" />
-    </com.github.chaossss.pianoview.PianoView>
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

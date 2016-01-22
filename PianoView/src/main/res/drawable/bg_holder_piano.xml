@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="#ffffff"/>
-    <corners android:radius="12dp"/>
+    <corners android:topRightRadius="@dimen/piano_item_bg_radius" android:topLeftRadius="@dimen/piano_item_bg_radius"/>
 </shape>

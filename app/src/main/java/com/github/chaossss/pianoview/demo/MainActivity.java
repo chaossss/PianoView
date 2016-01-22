@@ -2,18 +2,16 @@ package com.github.chaossss.pianoview.demo;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.util.TypedValue;
 import android.widget.Toast;
 
-import com.github.chaossss.pianoview.Card;
-import com.github.chaossss.pianoview.CardData;
+
 import com.github.chaossss.pianoview.PianoAdapter;
 import com.github.chaossss.pianoview.PianoItemListener;
 import com.github.chaossss.pianoview.PianoView;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class MainActivity extends FragmentActivity implements PianoItemListener {
     private PianoView pianoView;
@@ -26,9 +24,9 @@ public class MainActivity extends FragmentActivity implements PianoItemListener 
         setContentView(R.layout.activity_main);
 
         iconUrlList = new ArrayList<>();
-        pianoView = (PianoView) findViewById(R.id.box_rhythm);
+        pianoView = (PianoView) findViewById(R.id.piano_view);
         pianoView.setScrollPianoStartDelayTime(400);
-        pianoView.setPianoItepianoItemListener(this);
+        pianoView.setPianoItemListenerListener(this);
 
         fetchData();
         pianoView.showPianoAtPosition(0);
