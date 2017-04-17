@@ -8,13 +8,13 @@ PianoView 能提供一个有趣的类似钢琴键盘的 ViewPager Indicator，�
 
 ![](http://img.my.csdn.net/uploads/201601/22/1453434722_3349.gif)
 
-#Usage
+# Usage
 
-##Dependency
+## Dependency
 
-###Min SDK：2.3.3
+### Min SDK：2.3.3
 
-###Add Dependency
+### Add Dependency
 
 在项目的 build.gradle 里添加：
 
@@ -25,11 +25,11 @@ dependencies {
 }
 ```
 
-##Customize PianoView
+## Customize PianoView
 
 目前还没有提供自定义的特性
 
-##Activity
+## Activity
 
 ```java
 public class MainActivity extends FragmentActivity implements PianoItemListener {
@@ -72,7 +72,7 @@ public class MainActivity extends FragmentActivity implements PianoItemListener 
 }
 ```
 
-##XML
+## XML
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -88,7 +88,7 @@ public class MainActivity extends FragmentActivity implements PianoItemListener 
 </RelativeLayout>
 ```
 
-##License
+## License
 Copyright (C) 2016 Cheelok
 
 Licensed under the Apache License, Version 2.0 (the "License");

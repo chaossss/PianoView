@@ -8,13 +8,13 @@ Preview：
 
 ![](http://img.my.csdn.net/uploads/201601/22/1453434722_3349.gif)
 
-#Usage
+# Usage
 
-##Dependency
+## Dependency
 
-###Min SDK：2.3.3
+### Min SDK：2.3.3
 
-###Add Dependency
+### Add Dependency
 
 add below code in your build.gradle:
 
@@ -25,11 +25,11 @@ dependencies {
 }
 ```
 
-##Customize PianoView
+## Customize PianoView
 
 PianoView can't customize now
 
-##Activity
+## Activity
 
 ```java
 public class MainActivity extends FragmentActivity implements PianoItemListener {
@@ -72,7 +72,7 @@ public class MainActivity extends FragmentActivity implements PianoItemListener 
 }
 ```
 
-##XML
+## XML
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -88,7 +88,7 @@ public class MainActivity extends FragmentActivity implements PianoItemListener 
 </RelativeLayout>
 ```
 
-##License
+## License
 Copyright (C) 2016 Cheelok
 
 Licensed under the Apache License, Version 2.0 (the "License");
